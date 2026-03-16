@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from backend.db import init_db
-from backend.retrieval import decompose_and_expand, retrieve_multi, extract_filters
+from backend.retrieval import decompose_and_expand, retrieve_multi
 from backend.chat import SYSTEM_PROMPT, build_user_prompt
 from backend.chat import sessions
 from backend.ai_clients.openai_client import OpenAIClient
@@ -33,17 +33,15 @@ async def chat(request: Request):
 
     sessions.add_message(session_id, "user", question)
 
-    # Run query decomposition and ticker/filing type detection
-    sub_queries = decompose_and_expand(question)
-    filters = extract_filters(question)
-    tickers = filters.get("tickers", [])
-    filing_types = filters.get("filing_types", [])
+    # Run query decomposition and ticker detection
+    search_plan = decompose_and_expand(question)
+    sub_queries = search_plan.queries
+    tickers = search_plan.tickers
 
-    # Pass tickers and filing_types to retrieval so results are filtered to relevant documents
+    # Pass tickers to retrieval so results are filtered to relevant documents
     chunks = retrieve_multi(
         sub_queries, 
-        tickers=tickers if tickers else None,
-        filing_types=filing_types if filing_types else None
+        tickers=tickers if tickers else None
     )
     user_prompt = build_user_prompt(question, chunks)
 

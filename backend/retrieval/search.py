@@ -6,7 +6,6 @@ def retrieve(
     query: str,
     top_k: int = 12,
     ticker: str | None = None,
-    filing_type: str | None = None,
     section: str | None = None,
 ) -> list[dict]:
     query_embedding = embed_texts([query])[0]
@@ -20,9 +19,6 @@ def retrieve(
     if ticker:
         conditions.append("d.ticker = %s")
         extra_params.append(ticker)
-    if filing_type:
-        conditions.append("d.filing_type = %s")
-        extra_params.append(filing_type)
     if section:
         conditions.append("c.section = %s")
         extra_params.append(section)
@@ -94,12 +90,11 @@ def retrieve_multi(
     top_k_per_query: int = 8,
     final_top_k: int = 15,
     tickers: list[str] | None = None,
-    filing_types: list[str] | None = None,
 ) -> list[dict]:
     """Retrieve and RRF-merge chunks across multiple queries.
 
-    If ``tickers`` or ``filing_types`` is provided, only chunks matching those
-    conditions will be returned. Each query is run for each ticker/filing_type
+    If ``tickers`` is provided, only chunks matching those
+    conditions will be returned. Each query is run for each ticker
     combination so the DB-level filter is applied appropriately.
     """
     all_results: list[dict] = []
@@ -107,15 +102,13 @@ def retrieve_multi(
 
     # Determine the dimensions to iterate over
     ticker_filters: list[str | None] = list(tickers) if tickers else [None]
-    filing_filters: list[str | None] = list(filing_types) if filing_types else [None]
 
     for query in queries:
         for ticker_filter in ticker_filters:
-            for filing_filter in filing_filters:
-                results = retrieve(query, top_k=top_k_per_query, ticker=ticker_filter, filing_type=filing_filter)
-                for r in results:
-                    if r["id"] not in seen_ids:
-                        seen_ids.add(r["id"])
-                        all_results.append(r)
+            results = retrieve(query, top_k=top_k_per_query, ticker=ticker_filter)
+            for r in results:
+                if r["id"] not in seen_ids:
+                    seen_ids.add(r["id"])
+                    all_results.append(r)
 
     return all_results[:final_top_k]

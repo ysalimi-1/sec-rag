@@ -12,4 +12,4 @@ def build_user_prompt(question: str, chunks: list[dict]) -> str:
 
 Question: {question}
 
-Provide a well-structured answer grounded in the above filing data. Cite sources."""
+Provide a comprehensive, well-structured answer grounded in the above filing data. Ensure you address every part of the question. If multiple entities or time periods are mentioned, give each balanced coverage. Cite your sources using the [Ticker, Filing Type, Date] format."""

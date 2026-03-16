@@ -89,10 +89,22 @@ async function sendMessage(question) {
     sendBtn.disabled = true;
 
     // --- Loading Status Indicator ---
-    assistantEl.innerHTML = `<div class="status-indicator"><div class="spinner"></div><span class="status-text">Retrieving info...</span></div>`;
-    let statusTimer = setTimeout(() => {
-        const textEl = assistantEl.querySelector('.status-text');
-        if (textEl) textEl.textContent = "Thinking...";
+    const statuses = [
+        "Understanding your question...",
+        "Searching documents...",
+        "Ranking relevant sources...",
+        "Building context...",
+        "Generating answer..."
+    ];
+    let currentStatusIdx = 0;
+    assistantEl.innerHTML = `<div class="status-indicator"><div class="spinner"></div><span class="status-text">${statuses[0]}</span></div>`;
+    
+    let statusTimer = setInterval(() => {
+        if (currentStatusIdx < statuses.length - 1) {
+            currentStatusIdx++;
+            const textEl = assistantEl.querySelector('.status-text');
+            if (textEl) textEl.textContent = statuses[currentStatusIdx];
+        }
     }, 2000);
     let isFirstToken = true;
 
@@ -134,7 +146,7 @@ async function sendMessage(question) {
                 const data = JSON.parse(line.slice(6));
                 if (data.token) {
                     if (isFirstToken) {
-                        clearTimeout(statusTimer);
+                        clearInterval(statusTimer);
                         isFirstToken = false;
                     }
                     rawText += data.token;
@@ -151,7 +163,7 @@ async function sendMessage(question) {
             }
         }
     } catch (err) {
-        if (typeof statusTimer !== 'undefined') clearTimeout(statusTimer);
+        if (typeof statusTimer !== 'undefined') clearInterval(statusTimer);
         assistantEl.textContent = "Error: " + err.message;
     }
 
