@@ -1,7 +1,7 @@
 import json
 from openai import OpenAI
 from backend.config import OPENAI_API_KEY, DECOMPOSE_MODEL
-from backend.chat.prompts import DECOMPOSE_SYSTEM
+from backend.chat.prompts import get_decompose_system
 
 _client = OpenAI(api_key=OPENAI_API_KEY)
 
@@ -17,7 +17,7 @@ def decompose_and_expand(query: str) -> SearchPlan:
     resp = _client.beta.chat.completions.parse(
         model=DECOMPOSE_MODEL,
         messages=[
-            {"role": "system", "content": DECOMPOSE_SYSTEM},
+            {"role": "system", "content": get_decompose_system()},
             {"role": "user", "content": query},
         ],
         response_format=SearchPlan,

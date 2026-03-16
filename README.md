@@ -92,7 +92,7 @@ Detailed results are available in [eval.md](eval.md).
 
 **Text Cleanup**: EDGAR filings contain XBRL inline data, HTML tags, and machine-readable identifiers. The parser strips all non-prose content and removes Table of Contents entries to keep only readable text.
 
-**Chunking**: TOC-aware splitting at section boundaries, falling back to paragraph boundaries (1500 tokens, 200 overlap). Chunks below a minimum token count are merged or discarded. Each chunk is prepended with a metadata header (company, ticker, type, date, quarter) so the embedding and LLM always retain source context.
+**Chunking**: TOC-aware splitting at section boundaries, falling back to paragraph boundaries (2500 tokens). Chunks below a minimum token count are merged or discarded. Each chunk is prepended with a metadata header (company, ticker, type, date, quarter) so the embedding and LLM always retain source context.
 
 **Query Decomposition + Expansion**: Complex queries are broken into sub-queries by `gpt-5-nano` using **OpenAI Structured Outputs**. It extracts explicit stock tickers and implied entities, which are used to pre-filter PostgreSQL results, dramatically reducing noise from unrelated companies' filings.
 

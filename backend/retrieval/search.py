@@ -88,7 +88,7 @@ def _rrf_merge(vector_results: list, keyword_results: list, top_k: int, k: int =
 def retrieve_multi(
     queries: list[str],
     top_k_per_query: int = 8,
-    final_top_k: int = 15,
+    final_top_k: int = 20,
     tickers: list[str] | None = None,
 ) -> list[dict]:
     """Retrieve and RRF-merge chunks across multiple queries.
