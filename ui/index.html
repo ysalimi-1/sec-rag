@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EDGAR RAG</title>
+    <meta name="description" content="SEC EDGAR filing analysis with RAG">
+    <link rel="stylesheet" href="styles.css?v=8">
+</head>
+<body>
+    <div id="app">
+        <aside id="sidebar">
+            <button id="new-chat">+ New Chat</button>
+            <div id="session-list"></div>
+        </aside>
+        <main>
+            <div id="messages"></div>
+            <form id="chat-form">
+                <input type="text" id="question" placeholder="Ask about SEC filings..." autocomplete="off">
+                <button type="submit" id="send-btn">Send</button>
+            </form>
+        </main>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="app.js?v=6"></script>
+</body>
+</html>

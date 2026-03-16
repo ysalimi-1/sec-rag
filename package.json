@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "jsdom": "^27.0.1",
+    "marked": "^17.0.4"
+  }
+}

@@ -1,0 +1,38 @@
+AI Engineering Assessment
+Overview
+Build a working demo that answers a business question about SEC financial filings using a single LLM API call with retrieval-augmented generation.
+
+Timebox: ~4 hours
+The Task
+Build a retrieval index over the provided corpus and a prompt template that injects retrieved context into a single LLM call. The system should accept a natural-language business question as input and return a well-structured answer grounded in the filing data.
+
+The final answer must be produced in one API request. Your indexing and retrieval pipeline can run beforehand, but the answer itself must come from a single LLM call. Beyond that constraint, the design is yours.
+
+Document your assumptions and the decisions you make along the way.
+Dataset
+The corpus is a collection of SEC EDGAR filings — annual reports (10-K) and quarterly reports (10-Q) from major US public companies spanning 2023–2025.
+
+Download the corpus here:
+
+edgar_corpus.zip
+
+The zip contains .txt filings and a manifest.json.
+Business Question
+During the demo, we will enter a business question into your system's input field. Examples of what we might ask:
+
+"What are the primary risk factors facing Apple, Tesla, and JPMorgan, and how do they compare?"
+"How has NVIDIA's revenue and growth outlook changed over the last two years?"
+"What regulatory risks do the major pharmaceutical companies face, and how are they addressing them?"
+Deliverables
+Submit a repo or notebook containing:
+
+A README with setup and run instructions
+Your indexing and retrieval code
+A log of your prompt iterations (what changed, why)
+Your final prompt template
+An example request ready to execute
+Notes on how you evaluated quality
+Demo Format
+We'll clone your repo, set up the environment using your instructions, and run a business question through your system live. Be prepared to walk through your design decisions.
+Questions
+If anything is unclear, ask. We'd rather answer a good question now than review a set of wrong assumptions later.
