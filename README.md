@@ -9,6 +9,7 @@ backend/
   config.py              - env config (loads .env)
   db.py                  - postgres + pgvector schema & helpers
   api.py                 - FastAPI server (also serves the UI)
+  evaluate.py            - LLM-as-a-judge benchmark for RAG quality
   ingestion/
     parser.py            - XBRL cleanup, HTML stripping, metadata extraction
     chunker.py           - token-aware chunking with TOC-aware section splitting
@@ -21,7 +22,7 @@ backend/
     base.py              - abstract AI client interface
     openai_client.py     - OpenAI streaming implementation
   chat/
-    prompts.py           - system/user prompt templates
+    prompts/             - modular system, user, and decomposer prompt templates
     sessions.py          - postgres-backed chat session management
 ui/
   index.html             - chat interface (served by FastAPI at /)
@@ -41,6 +42,8 @@ ui/
 # 1. Copy env and fill in your OpenAI key
 cp .env.example .env
 # Edit .env and set OPENAI_API_KEY=sk-...
+# Set up the path to the edgar_corpus directory in the .env file (CORPUS_DIR)
+# an easy set up is to copy the edgar_corpus directory to the root directory and set CORPUS_DIR=edgar_corpus
 
 # 2. Start Postgres with pgvector
 docker compose up -d
@@ -55,11 +58,24 @@ uv run python -m backend.ingestion.pipeline
 
 # 5. Start the server + UI
 uv run python -m backend.api
+
+# 6. (Optional) Run benchmarks
+uv run python -m backend.evaluate
 ```
 
 **Open [http://localhost:8000](http://localhost:8000) in your browser.**
 
 The FastAPI server serves the chat UI directly — no separate UI server or build step is needed.
+
+## Evaluation
+
+The project includes an automated evaluation suite in `backend/evaluate.py` that uses an **LLM-as-a-judge** approach to grade RAG performance. 
+
+- **Metrics**: Grades Context Relevance, Groundedness, and Completeness on a 1-5 scale.
+- **Comparison**: Benchmarks the "Baseline" (raw query) against the "Advanced" (decomposed + ticker-filtered) retrieval paths.
+- **Results**: Our benchmarks show that decomposition significantly improves **Completeness** (from 3.3 to 4.0) and **Groundedness** (from 3.5 to 3.9) for complex financial queries.
+
+Detailed results are available in [eval.md](eval.md).
 
 ## Environment Variables
 
@@ -78,7 +94,7 @@ The FastAPI server serves the chat UI directly — no separate UI server or buil
 
 **Chunking**: TOC-aware splitting at section boundaries, falling back to paragraph boundaries (1500 tokens, 200 overlap). Chunks below a minimum token count are merged or discarded. Each chunk is prepended with a metadata header (company, ticker, type, date, quarter) so the embedding and LLM always retain source context.
 
-**Query Decomposition + Expansion**: Complex queries are broken into up to 4 sub-queries by `gpt-5-nano`. Each sub-query is expanded with ticker symbols, SEC terminology, and financial vocabulary to optimize retrieval across multiple angles of the question.
+**Query Decomposition + Expansion**: Complex queries are broken into sub-queries by `gpt-5-nano` using **OpenAI Structured Outputs**. It extracts explicit stock tickers and implied entities, which are used to pre-filter PostgreSQL results, dramatically reducing noise from unrelated companies' filings.
 
 **Hybrid Retrieval (RRF)**: Combines pgvector cosine similarity with PostgreSQL trigram matching via Reciprocal Rank Fusion. Vector search captures semantic meaning; trigram search catches exact ticker/company name matches and financial terms.
 
@@ -92,15 +108,15 @@ The FastAPI server serves the chat UI directly — no separate UI server or buil
 User Question
     |
     v
-Query Decomposer (gpt-5-nano)         --> up to 8 retrieval-optimized sub-queries
-    |                                      expanded with tickers + SEC terms
+Query Decomposer (gpt-5-nano)         --> extract tickers + sub-queries (Pydantic)
+    |                                      (pre-filters doc set by ticker)
     v
 Hybrid Retrieval (per sub-query)       --> pgvector cosine + pg_trgm keyword
     |                                      merged via RRF, deduplicated
     v
 Prompt Assembly                        --> system prompt + chunks + question
     v
-LLM (gpt-5.2, single streaming call)
+LLM (gpt-5.3, single streaming call)
     v
 Streamed Answer with Source Citations
 ```
