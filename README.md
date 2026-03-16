@@ -92,7 +92,7 @@ The FastAPI server serves the chat UI directly — no separate UI server or buil
 User Question
     |
     v
-Query Decomposer (gpt-5-nano)         --> up to 4 retrieval-optimized sub-queries
+Query Decomposer (gpt-5-nano)         --> up to 8 retrieval-optimized sub-queries
     |                                      expanded with tickers + SEC terms
     v
 Hybrid Retrieval (per sub-query)       --> pgvector cosine + pg_trgm keyword
@@ -100,7 +100,7 @@ Hybrid Retrieval (per sub-query)       --> pgvector cosine + pg_trgm keyword
     v
 Prompt Assembly                        --> system prompt + chunks + question
     v
-LLM (gpt-5.3, single streaming call)
+LLM (gpt-5.2, single streaming call)
     v
 Streamed Answer with Source Citations
 ```

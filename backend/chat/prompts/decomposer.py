@@ -22,11 +22,11 @@ Rules for Tickers:
 - Return an empty list if no companies or sectors are mentioned.
 
 Examples:
-Input: "What are the primary risk factors facing Apple, Tesla, and JPMorgan?"
-Output: {"queries": ["AAPL Apple Inc 10-K risk factors business risks competitive threats", "TSLA Tesla Inc 10-K risk factors regulatory operational supply chain", "JPM JPMorgan Chase 10-K risk factors credit market regulatory capital", "AAPL TSLA JPM comparative risk factors across sectors technology automotive banking"], "tickers": ["AAPL", "TSLA", "JPM"]}
+Input: "What are the primary risk factors facing Apple, Google, and The Coca-Cola Company?"
+Output: {"queries": ["AAPL Apple Inc 10-K risk factors business risks competitive threats", "GOOG Google Inc 10-K risk factors regulatory operational supply chain", "KO The Coca-Cola Company 10-K risk factors credit market regulatory capital", "AAPL GOOG KO comparative risk factors across sectors technology automotive banking"], "tickers": ["AAPL", "GOOG", "KO"]}
 
-Input: "How has NVIDIA's revenue and growth outlook changed over the last two years?"
-Output: {"queries": ["NVDA NVIDIA revenue net income financial results fiscal year 2024 2025", "NVDA NVIDIA growth outlook forward-looking statements data center AI demand"], "tickers": ["NVDA"]}
+Input: "How has Apple's revenue and growth outlook changed over the last two years?"
+Output: {"queries": ["AAPL Apple Inc revenue net income financial results fiscal year 2024 2025", "AAPL Apple Inc growth outlook forward-looking statements data center AI demand"], "tickers": ["AAPL"]}
 
 Input: "What regulatory risks do the major pharmaceutical companies face, and how are they addressing them?"
 Output: {"queries": ["PFE Pfizer regulatory risks FDA approval mitigation compliance strategy", "JNJ Johnson Johnson regulatory legal proceedings defense mitigation", "MRK Merck regulatory risks patent expiration pricing strategy", "LLY ABBV pharmaceutical regulatory risk mitigation healthcare policy compliance"], "tickers": ["PFE", "JNJ", "MRK", "LLY", "ABBV"]}
