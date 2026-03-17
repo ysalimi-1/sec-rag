@@ -1,8 +1,23 @@
 import psycopg
 from psycopg.rows import dict_row
+from psycopg_pool import AsyncConnectionPool
 from backend.config import DATABASE_URL, EMBEDDING_DIMS
 
 _pool = None
+
+
+async def get_pool():
+    global _pool
+    if _pool is None:
+        _pool = AsyncConnectionPool(
+            DATABASE_URL, 
+            min_size=1, 
+            max_size=10, 
+            kwargs={"row_factory": dict_row},
+            open=False
+        )
+        await _pool.open()
+    return _pool
 
 
 def get_conn():
@@ -67,9 +82,11 @@ def init_db(overwrite: bool = False):
                 WITH (lists = 100)
             """)
 
+            # Drop old GIN index and create GIST for distance-based ordering
+            cur.execute("DROP INDEX IF EXISTS idx_chunks_content_trgm")
             cur.execute("""
-                CREATE INDEX IF NOT EXISTS idx_chunks_content_trgm
-                ON chunks USING gin (content gin_trgm_ops)
+                CREATE INDEX IF NOT EXISTS idx_chunks_content_trgm_gist
+                ON chunks USING gist (content gist_trgm_ops)
             """)
 
         conn.commit()

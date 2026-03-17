@@ -39,7 +39,7 @@ async def chat(request: Request):
     tickers = search_plan.tickers
 
     # Pass tickers to retrieval so results are filtered to relevant documents
-    chunks = retrieve_multi(
+    chunks = await retrieve_multi(
         sub_queries, 
         tickers=tickers if tickers else None
     )
